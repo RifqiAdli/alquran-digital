@@ -1,0 +1,277 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --background: 220 39% 11%;
+  --foreground: 0 0% 98%;
+  --card: 215 39% 15%;
+  --card-foreground: 0 0% 98%;
+  --popover: 215 39% 15%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 166 76% 37%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 215 25% 27%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 215 25% 27%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 159 62% 52%;
+  --accent-foreground: 0 0% 9%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 215 25% 27%;
+  --input: 215 25% 27%;
+  --ring: 166 76% 37%;
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-foreground min-h-screen;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .arabic-text {
+    font-family: 'Amiri', serif;
+    direction: rtl;
+    text-align: right;
+    line-height: 2;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  
+  .glass-button {
+    @apply bg-emerald-500/20 backdrop-blur-sm border border-emerald-400/30 rounded-lg transition-all duration-300;
+  }
+  
+  .glass-button:hover {
+    @apply bg-emerald-500/30 border-emerald-400/50 scale-105;
+  }
+  
+  .glass-input {
+    @apply bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg px-4 py-2 text-white placeholder-white/60 focus:border-emerald-400/50 focus:bg-white/10 transition-all duration-300;
+  }
+  
+  .floating-audio {
+    @apply fixed bottom-0 left-0 right-0 glass-card border-t border-white/20 z-50;
+  }
+  
+  /* Fixed: Using available Tailwind opacity values */
+  .ayah-card {
+    @apply glass-card p-6 mb-4 transition-all duration-300;
+  }
+  
+  .ayah-card:hover {
+    @apply bg-white/20;
+  }
+  
+  .surah-card {
+    @apply glass-card p-6 hover:scale-105 transition-all duration-300 cursor-pointer;
+  }
+  
+  .surah-card:hover {
+    @apply bg-white/20;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent;
+  }
+  
+  /* Additional glass effects */
+  .glass-nav {
+    @apply bg-slate-900/80 backdrop-blur-xl border-b border-white/10;
+  }
+  
+  .glass-modal {
+    @apply bg-black/50 backdrop-blur-sm;
+  }
+  
+  .glass-sidebar {
+    @apply bg-slate-900/90 backdrop-blur-xl border-r border-white/10;
+  }
+}
+
+@layer utilities {
+  .animation-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .animation-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animation-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  
+  /* Custom hover effects */
+  .hover-lift {
+    @apply transition-transform duration-300 ease-out;
+  }
+  
+  .hover-lift:hover {
+    @apply -translate-y-1 shadow-xl;
+  }
+  
+  .hover-glow {
+    @apply transition-all duration-300;
+  }
+  
+  .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes slideUp {
+  from { 
+    transform: translateY(100%); 
+  }
+  to { 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(16, 185, 129, 0.5); 
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); 
+  }
+}
+
+/* Responsive design helpers */
+.container-responsive {
+  @apply px-4 mx-auto;
+}
+
+@media (min-width: 375px) {
+  .container-responsive { 
+    @apply px-6; 
+  }
+}
+
+@media (min-width: 768px) {
+  .container-responsive { 
+    @apply px-8 max-w-6xl; 
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive { 
+    @apply px-12 max-w-7xl; 
+  }
+}
+
+@media (min-width: 1280px) {
+  .container-responsive { 
+    @apply max-w-7xl; 
+  }
+}
+
+/* Typography responsive scaling */
+.text-arabic-responsive {
+  font-family: 'Amiri', serif;
+  direction: rtl;
+  text-align: right;
+  line-height: 2;
+  @apply text-2xl;
+}
+
+@media (min-width: 768px) {
+  .text-arabic-responsive {
+    @apply text-3xl;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-arabic-responsive {
+    @apply text-4xl;
+  }
+}
+
+@media (min-width: 1280px) {
+  .text-arabic-responsive {
+    @apply text-5xl;
+  }
+}
+
+.text-translation-responsive {
+  @apply text-sm leading-relaxed;
+}
+
+@media (min-width: 768px) {
+  .text-translation-responsive {
+    @apply text-base;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-translation-responsive {
+    @apply text-lg;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-emerald-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-emerald-500;
+}
+
+/* Mobile touch optimizations */
+@media (max-width: 768px) {
+  .touch-target {
+    @apply min-w-[44px] min-h-[44px];
+  }
+  
+  .mobile-padding {
+    @apply p-4;
+  }
+  
+  .mobile-text {
+    @apply text-sm;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-friendly {
+    @apply text-black bg-white;
+  }
+}
