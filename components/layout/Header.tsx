@@ -61,7 +61,7 @@ export default function Header() {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-xl md:text-2xl font-bold gradient-text">
-                  Al-Quran Digital
+                  Al-Quran Digital | V.1.0.2
                 </h1>
                 <p className="text-xs text-white/60">Modern & Responsive</p>
               </div>
@@ -206,7 +206,7 @@ export default function Header() {
             {/* Footer in Mobile Menu */}
             <div className="p-6 border-t border-white/20 mt-auto">
               <div className="text-center">
-                <p className="text-sm text-white/60 mb-2">Al-Quran Digital</p>
+                <p className="text-sm text-white/60 mb-2">Al-Quran Digital V.1.0.2</p>
                 <p className="text-xs text-white/40">
                   Membaca Al-Quran dengan teknologi modern
                 </p>
