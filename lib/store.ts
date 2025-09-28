@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Surah, Ayah, SurahDetail } from './api';
+import { Surah, Ayah, SurahDetail, SurahTafsir } from './api';
 
 // Cache utility class
 class CacheManager {
@@ -48,11 +48,17 @@ class CacheManager {
 
   cleanup(): void {
     const now = Date.now();
-    for (const [key, item] of this.cache.entries()) {
+    const keysToDelete: string[] = [];
+    
+    this.cache.forEach((item, key) => {
       if (now - item.timestamp > item.ttl) {
-        this.cache.delete(key);
+        keysToDelete.push(key);
       }
-    }
+    });
+    
+    keysToDelete.forEach(key => {
+      this.cache.delete(key);
+    });
   }
 }
 
@@ -105,7 +111,7 @@ interface AppState {
   surahList: Surah[];
   currentSurahDetail: SurahDetail | null;
   
-  // Original Actions
+  // Actions
   setAudioState: (state: Partial<AudioState>) => void;
   toggleBookmarkSurah: (surahId: number) => void;
   toggleBookmarkAyah: (surahId: number, ayahId: number) => void;
@@ -120,12 +126,13 @@ interface AppState {
   // Enhanced actions with caching
   loadSurahList: () => Promise<Surah[]>;
   loadSurahDetail: (surahId: number) => Promise<SurahDetail>;
-  loadTafsir: (surahId: number, ayahId: number) => Promise<string>;
+  loadTafsir: (surahId: number, ayahId?: number) => Promise<SurahTafsir>;
   preloadSurahDetail: (surahId: number) => Promise<void>;
   preloadAdjacentSurahs: (currentSurahId: number) => Promise<void>;
   clearCache: () => void;
   getCachedSurahDetail: (surahId: number) => SurahDetail | null;
   searchSurah: (query: string) => Surah[];
+  getAudioUrl: (audio: { [key: string]: string }, qari?: string) => string;
 }
 
 export const useAppStore = create<AppState>()(
@@ -234,11 +241,18 @@ export const useAppStore = create<AppState>()(
 
         const loadPromise = (async () => {
           try {
-            // Replace with your actual API call
-            const response = await fetch('/api/surah-list');
-            if (!response.ok) throw new Error('Failed to fetch');
+            const response = await fetch('https://equran.id/api/v2/surat', {
+              headers: {
+                'Accept': 'application/json',
+              },
+            });
             
-            const data: Surah[] = await response.json();
+            if (!response.ok) {
+              throw new Error(`Failed to fetch surah list: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            const data: Surah[] = result.data || result;
             
             // Cache the result
             cacheManager.set(cacheKey, data, 1000 * 60 * 60 * 24); // 24 hours
@@ -254,7 +268,7 @@ export const useAppStore = create<AppState>()(
             
             return data;
           } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorMessage = error instanceof Error ? error.message : 'Gagal memuat daftar surat';
             set((state) => ({ 
               cache: { ...state.cache, isLoading: false, error: errorMessage }
             }));
@@ -287,11 +301,18 @@ export const useAppStore = create<AppState>()(
 
         const loadPromise = (async () => {
           try {
-            // Replace with your actual API call
-            const response = await fetch(`/api/surah/${surahId}`);
-            if (!response.ok) throw new Error('Failed to fetch surah detail');
+            const response = await fetch(`https://equran.id/api/v2/surat/${surahId}`, {
+              headers: {
+                'Accept': 'application/json',
+              },
+            });
             
-            const data: SurahDetail = await response.json();
+            if (!response.ok) {
+              throw new Error(`Failed to fetch surah ${surahId}: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            const data: SurahDetail = result.data || result;
             
             // Cache the result
             cacheManager.set(cacheKey, data, 1000 * 60 * 60 * 6); // 6 hours
@@ -306,7 +327,7 @@ export const useAppStore = create<AppState>()(
             
             return data;
           } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorMessage = error instanceof Error ? error.message : 'Gagal memuat detail surat';
             set((state) => ({ 
               cache: { ...state.cache, isLoading: false, error: errorMessage }
             }));
@@ -320,11 +341,11 @@ export const useAppStore = create<AppState>()(
         return loadPromise;
       },
 
-      loadTafsir: async (surahId: number, ayahId: number) => {
-        const cacheKey = `tafsir-${surahId}-${ayahId}`;
+      loadTafsir: async (surahId: number, ayahId?: number) => {
+        const cacheKey = ayahId ? `tafsir-${surahId}-${ayahId}` : `tafsir-${surahId}`;
         
         // Check cache first
-        const cached = cacheManager.get<string>(cacheKey);
+        const cached = cacheManager.get<SurahTafsir>(cacheKey);
         if (cached) {
           return cached;
         }
@@ -336,18 +357,25 @@ export const useAppStore = create<AppState>()(
 
         const loadPromise = (async () => {
           try {
-            // Replace with your actual API call
-            const response = await fetch(`/api/tafsir/${surahId}/${ayahId}`);
-            if (!response.ok) throw new Error('Failed to fetch tafsir');
+            const response = await fetch(`https://equran.id/api/v2/tafsir/${surahId}`, {
+              headers: {
+                'Accept': 'application/json',
+              },
+            });
             
-            const data = await response.text();
+            if (!response.ok) {
+              throw new Error(`Failed to fetch tafsir ${surahId}: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            const data: SurahTafsir = result.data || result;
             
             // Cache the result
             cacheManager.set(cacheKey, data, 1000 * 60 * 60 * 12); // 12 hours
             
             return data;
           } catch (error) {
-            console.error(`Error loading tafsir ${surahId}:${ayahId}:`, error);
+            console.error(`Error loading tafsir ${surahId}:`, error);
             throw error;
           } finally {
             loadingStates.delete(cacheKey);
@@ -399,10 +427,10 @@ export const useAppStore = create<AppState>()(
         
         const searchTerm = query.toLowerCase();
         return surahList.filter(surah => 
-          surah.nama_latin.toLowerCase().includes(searchTerm) ||
-          surah.nama.toLowerCase().includes(searchTerm) ||
+          surah.namaLatin.toLowerCase().includes(searchTerm) ||
+          surah.nama.includes(query) ||
           surah.arti.toLowerCase().includes(searchTerm) ||
-          surah.nomor.toString().includes(searchTerm)
+          surah.nomor.toString() === query
         );
       },
 
@@ -412,6 +440,12 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           cache: { ...state.cache, lastUpdated: null }
         }));
+      },
+
+      getAudioUrl: (audio: { [key: string]: string }, qari?: string) => {
+        const { selectedQari } = get();
+        const targetQari = qari || selectedQari || '05';
+        return audio[targetQari] || audio['05'] || '';
       },
     }),
     {
