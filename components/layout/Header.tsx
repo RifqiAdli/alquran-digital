@@ -14,6 +14,7 @@ import {
   DocumentTextIcon,
   ShieldCheckIcon,
   UserGroupIcon,
+  CloudArrowDownIcon
 } from '@heroicons/react/24/outline';
 import { useAppStore } from '@/lib/store';
 import SearchModal from '../search/SearchModal';
@@ -38,12 +39,15 @@ export default function Header() {
     { name: 'Beranda', href: '/', icon: HomeIcon },
     { name: 'Surat', href: '/surat', icon: BookOpenIcon },
     { name: 'Bookmark', href: '/bookmark', icon: BookmarkIcon },
+    { name: 'Download', href: '/download', icon: CloudArrowDownIcon },
+
   ];
 
   const additionalPages = [
     { name: 'Tentang Kami', href: '/about', icon: UserGroupIcon },
     { name: 'Syarat & Ketentuan', href: '/terms', icon: DocumentTextIcon },
     { name: 'Kebijakan Privasi', href: '/privacy', icon: ShieldCheckIcon },
+    
   ];
 
   return (
